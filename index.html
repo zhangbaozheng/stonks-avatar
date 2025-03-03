@@ -2,16 +2,31 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stonks图片上传la</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Stonks 图片合成</title>
     <style>
-        body { text-align: center; font-family: Arial, sans-serif; }
-        #canvas-container { position: relative; display: inline-block; border: 1px solid #ddd; }
-        canvas { background: #f0f0f0; }
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            touch-action: none; /* 防止滚动干扰拖拽 */
+        }
+        #canvas-container {
+            position: relative;
+            display: inline-block;
+            border: 1px solid #ddd;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            background: #f0f0f0;
+            touch-action: none; /* 允许拖拽 */
+        }
     </style>
 </head>
 <body>
-    <h2>Stonks图片上传</h2>
+    <h2>Stonks 图片合成</h2>
     <input type="file" id="upload" multiple accept="image/*">
     <br><br>
     <label for="image-size">图片大小:</label>
@@ -19,7 +34,7 @@
     <span id="size-value">150</span>
     <br><br>
     <div id="canvas-container">
-        <canvas id="canvas" width="500" height="500"></canvas>
+        <canvas id="canvas"></canvas>
     </div>
     <br>
     <button id="download">下载合成图片</button>
@@ -31,8 +46,18 @@
         const download = document.getElementById('download');
         const imageSizeInput = document.getElementById('image-size');
         const sizeValue = document.getElementById('size-value');
+        
         let images = [];
         let imageSize = parseInt(imageSizeInput.value);
+
+        // 设置 canvas 适应屏幕
+        function resizeCanvas() {
+            canvas.width = Math.min(window.innerWidth * 0.9, 600);
+            canvas.height = canvas.width;
+            drawImages();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
         imageSizeInput.addEventListener('input', (event) => {
             imageSize = parseInt(event.target.value);
@@ -43,7 +68,6 @@
         upload.addEventListener('change', (event) => {
             const files = event.target.files;
             images = []; // 清空旧图片
-
             Array.from(files).forEach((file, index) => {
                 const img = new Image();
                 img.src = URL.createObjectURL(file);
@@ -55,10 +79,8 @@
         });
 
         function drawImages() {
-            // 绘制红色背景
             ctx.fillStyle = '#b71c1c'; // 深红色背景
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
             images.forEach(({ img, x, y }) => {
                 ctx.save();
                 ctx.beginPath();
@@ -70,29 +92,47 @@
             });
         }
 
-        // 让图片可以拖拽
+        // 让图片可以拖拽（支持鼠标和触摸）
         let dragging = null;
-        canvas.addEventListener('mousedown', (event) => {
-            const { offsetX, offsetY } = event;
-            dragging = images.find(({ x, y }) => Math.hypot(offsetX - x, offsetY - y) <= imageSize / 2);
-        });
-
-        canvas.addEventListener('mousemove', (event) => {
+        function startDrag(event) {
+            const x = event.touches ? event.touches[0].clientX - canvas.getBoundingClientRect().left : event.offsetX;
+            const y = event.touches ? event.touches[0].clientY - canvas.getBoundingClientRect().top : event.offsetY;
+            dragging = images.find(({ x: imgX, y: imgY }) => Math.hypot(x - imgX, y - imgY) <= imageSize / 2);
+        }
+        function moveDrag(event) {
             if (dragging) {
-                dragging.x = event.offsetX;
-                dragging.y = event.offsetY;
+                event.preventDefault();
+                const x = event.touches ? event.touches[0].clientX - canvas.getBoundingClientRect().left : event.offsetX;
+                const y = event.touches ? event.touches[0].clientY - canvas.getBoundingClientRect().top : event.offsetY;
+                dragging.x = x;
+                dragging.y = y;
                 drawImages();
             }
-        });
+        }
+        function stopDrag() { dragging = null; }
 
-        canvas.addEventListener('mouseup', () => { dragging = null; });
-        canvas.addEventListener('mouseleave', () => { dragging = null; });
+        canvas.addEventListener('mousedown', startDrag);
+        canvas.addEventListener('mousemove', moveDrag);
+        canvas.addEventListener('mouseup', stopDrag);
+        canvas.addEventListener('mouseleave', stopDrag);
 
+        // 兼容手机端触摸
+        canvas.addEventListener('touchstart', startDrag, { passive: false });
+        canvas.addEventListener('touchmove', moveDrag, { passive: false });
+        canvas.addEventListener('touchend', stopDrag);
+
+        // 下载图片并保存到相册
         download.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = 'merged-image.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            canvas.toBlob((blob) => {
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                link.download = 'merged-image.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 'image/png');
         });
     </script>
 </body>
