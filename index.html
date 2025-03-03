@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stonks图片上传la</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        #canvas-container { position: relative; display: inline-block; border: 1px solid #ddd; }
+        canvas { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h2>Stonks图片上传</h2>
+    <input type="file" id="upload" multiple accept="image/*">
+    <br><br>
+    <label for="image-size">图片大小:</label>
+    <input type="range" id="image-size" min="50" max="600" value="150">
+    <span id="size-value">150</span>
+    <br><br>
+    <div id="canvas-container">
+        <canvas id="canvas" width="500" height="500"></canvas>
+    </div>
+    <br>
+    <button id="download">下载合成图片</button>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const upload = document.getElementById('upload');
+        const download = document.getElementById('download');
+        const imageSizeInput = document.getElementById('image-size');
+        const sizeValue = document.getElementById('size-value');
+        let images = [];
+        let imageSize = parseInt(imageSizeInput.value);
+
+        imageSizeInput.addEventListener('input', (event) => {
+            imageSize = parseInt(event.target.value);
+            sizeValue.textContent = imageSize;
+            drawImages();
+        });
+
+        upload.addEventListener('change', (event) => {
+            const files = event.target.files;
+            images = []; // 清空旧图片
+
+            Array.from(files).forEach((file, index) => {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    images.push({ img, x: canvas.width / 2, y: canvas.height / 2 });
+                    drawImages();
+                };
+            });
+        });
+
+        function drawImages() {
+            // 绘制红色背景
+            ctx.fillStyle = '#b71c1c'; // 深红色背景
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            images.forEach(({ img, x, y }) => {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x, y, imageSize / 2, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(img, x - imageSize / 2, y - imageSize / 2, imageSize, imageSize);
+                ctx.restore();
+            });
+        }
+
+        // 让图片可以拖拽
+        let dragging = null;
+        canvas.addEventListener('mousedown', (event) => {
+            const { offsetX, offsetY } = event;
+            dragging = images.find(({ x, y }) => Math.hypot(offsetX - x, offsetY - y) <= imageSize / 2);
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (dragging) {
+                dragging.x = event.offsetX;
+                dragging.y = event.offsetY;
+                drawImages();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => { dragging = null; });
+        canvas.addEventListener('mouseleave', () => { dragging = null; });
+
+        download.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'merged-image.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    </script>
+</body>
+</html>
