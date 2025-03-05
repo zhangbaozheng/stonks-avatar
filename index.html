@@ -44,19 +44,20 @@
         <option value="image/png">PNG（无损）</option>
         <option value="image/jpeg">JPG（高质量）</option>
     </select>
-    <br><br>
     <label for="use-bg">勾选-使用背景图片:</label>
-    <input type="checkbox" id="use-bg" checked>
+    <input type="checkbox" id="use-bg">
     <br><br>
 
     <label for="bg-color">可选背景颜色:</label>
     <input type="color" id="bg-color" value="#FF0000" disabled>
 
+    <button id="download">下载合成图片</button>
+
     <div id="canvas-container">
         <canvas id="canvas"></canvas>
     </div>
 
-    <button id="download">下载合成图片</button>
+    
 
 
 
