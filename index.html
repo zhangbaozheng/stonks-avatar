@@ -38,7 +38,7 @@
 
         .container {
             max-width: 400px;
-            margin: 20px auto;
+            margin: 0 auto;
             background: #222;
             padding: 15px;
             border-radius: 10px;
@@ -105,14 +105,18 @@
 </head>
 
 <body>
+   
     <div id="tab-s">
         <div data-page="avatar">制作头像</div>
         <div data-page="about">了解 Stonks</div>
         <div data-page="telegram">Telegram</div>
     </div>
-    
+    <img src="./img/logo5.png" style="width: 50px; height: 50px;" alt="">
     <div class="container avater-s">
-        <h2>Stonks 图片合成</h2>
+        <h2>
+            Stonks头像制作区~
+        </h2>
+        
         <input type="file" id="upload" multiple accept="image/*">
         
         <div class="input-group">
@@ -121,8 +125,8 @@
         </div>
         
         <div class="input-group">
-            <label for="use-bg">背景:</label>
-            <input type="checkbox" id="use-bg">
+            <label for="use-bg">点击右侧选择框勾选添加，背景:</label>
+            <input type="checkbox" style="width: 30px;height: 50px;" id="use-bg">
         </div>
         
         <div class="input-group">
