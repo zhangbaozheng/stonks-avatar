@@ -24,7 +24,7 @@ document.querySelectorAll('.bg-option').forEach(option => {
         // 添加当前选项的active类
         option.classList.add('active');
         // 更新背景图片
-        backgroundImage.src = `./img/${option.dataset.bg}.${option.dataset.bg === 'green' ? 'png' : 'PNG'}`;
+        backgroundImage.src = `./img/${option.dataset.bg}.${option.dataset.bg === 'green' ? 'png' : 'png'}`;
         // 自动勾选使用背景图片
         useBgCheckbox.checked = true;
         useBackgroundImage = true;
