@@ -16,6 +16,24 @@ let backgroundColor = bgColorPicker.value;
 let backgroundImage = new Image();
 backgroundImage.src = './img/bg.png'; // 背景图路径
 
+// 添加背景图片选择功能
+document.querySelectorAll('.bg-option').forEach(option => {
+    option.addEventListener('click', () => {
+        // 移除其他选项的active类
+        document.querySelectorAll('.bg-option').forEach(opt => opt.classList.remove('active'));
+        // 添加当前选项的active类
+        option.classList.add('active');
+        // 更新背景图片
+        backgroundImage.src = `./img/${option.dataset.bg}.${option.dataset.bg === 'green' ? 'png' : 'PNG'}`;
+        // 自动勾选使用背景图片
+        useBgCheckbox.checked = true;
+        useBackgroundImage = true;
+        bgColorPicker.disabled = true;
+        // 重新绘制
+        drawImages();
+    });
+});
+
 useBgCheckbox.addEventListener('change', () => {
     useBackgroundImage = useBgCheckbox.checked;
     bgColorPicker.disabled = useBackgroundImage;

@@ -101,6 +101,25 @@
         a {
             color: #fff;
         }
+        .bg-options {
+            display: flex;
+            gap: 10px;
+            margin-left: 10px;
+        }
+        .bg-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .bg-option:hover {
+            transform: scale(1.1);
+        }
+        .bg-option.active {
+            border-color: #fff;
+        }
     </style>
 </head>
 
@@ -141,6 +160,17 @@
         <div class="input-group">
             <label for="bg-color">颜色:</label>
             <input type="color" id="bg-color" value="#FF0000">
+        </div>
+
+        <div class="input-group">
+            <label>背景图片:</label>
+            <div class="bg-options">
+                <img src="./img/red.PNG" class="bg-option" data-bg="red">
+                <img src="./img/yellow.PNG" class="bg-option" data-bg="yellow">
+                <img src="./img/green.png" class="bg-option" data-bg="green">
+                <img src="./img/blue.PNG" class="bg-option" data-bg="blue">
+                <img src="./img/brown.PNG" class="bg-option" data-bg="brown">
+            </div>
         </div>
 
         <button id="download">下载图片</button>
